@@ -6,7 +6,7 @@ Summary
 * Jenkins creating pod agents when CI/CD pipeline start and destroy it when pipeline finish.
 * In pipeline we build container from app in repo push it to docker hub and after delpoy to EKS cluster.
 
-## Prepairing proccess. Run and configure aws-cli container, install need tools for wsl and tools for k8s cluster.
+### Prepairing proccess. Run and configure aws-cli container, install need tools for wsl and k8s cluster.
 
 ### Run Amazon CLI and conigure it.
 
