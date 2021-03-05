@@ -30,7 +30,6 @@ mv /tmp/eksctl /usr/local/bin
 yum install -y yum-utils
 yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
 yum -y install terraform
-
 ```
 
 ### Configure AWS credentials and provisioning EKS cluster
@@ -46,7 +45,6 @@ terraform apply
 # update kube config after EKS created.
 aws eks update-kubeconfig --name cluster-name --region eu-central-1
 cp ~/.kube/config .
-
 ```
 
 ### Setup our Cloud Storage 
@@ -72,14 +70,12 @@ aws efs create-mount-target --file-system-id FileSystemId --subnet-id SubnetID -
 
 # grab our volume handle to update our PV YAML
 aws efs describe-file-systems --query "FileSystems[*].FileSystemId" --output text
-
 ```
 
 ### Setup a namespace
 
 ```
 kubectl create ns jenkins
-
 ```
 
 ### Setup our storage for Jenkins
@@ -94,7 +90,6 @@ kubectl get pv
 # create volume claim
 kubectl apply -n jenkins -f ./jenkins/amazon-eks/jenkins.pvc.yaml
 kubectl -n jenkins get pvc
-
 ```
 
 ### Deploy Jenkins
@@ -104,14 +99,12 @@ kubectl -n jenkins get pvc
 kubectl apply -n jenkins -f ./jenkins/jenkins.rbac.yaml 
 kubectl apply -n jenkins -f ./jenkins/jenkins.deployment.yaml
 kubectl -n jenkins get pods
-
 ```
 
 ### Expose a service for agents
 
 ```
 kubectl apply -n jenkins -f ./jenkins/jenkins.service.yaml 
-
 ```
 
 ### Jenkins Initial Setup
@@ -122,7 +115,6 @@ kubectl port-forward -n jenkins <podname> 8080
 
 # setup user and recommended basic plugins
 # let it continue while we move on!
-
 ```
 
 ### SSH to our node to get Docker user info
@@ -145,7 +137,6 @@ Docker file is [here](../dockerfiles/dockerfile) <br/>
 
 cd ./jenkins/dockerfiles/
 docker build . -t aimvector/jenkins-slave
-
 ```
 
 ### Continue Jenkins setup. Configure Kubernetes Plugin
