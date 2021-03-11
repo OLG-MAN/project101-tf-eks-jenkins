@@ -38,13 +38,13 @@ yum -y install terraform
 # Configure your credenrtials from before created IAM account with all needed permissions
 aws configure
 
-# Init and deploy
+# Init and Deploy Terraform infrastructure
 terraform init
 terraform apply
 
 # update kube config after EKS created.
-aws eks update-kubeconfig --name cluster-name --region eu-central-1
-cp ~/.kube/config .
+aws eks update-kubeconfig --name CLUSTER_NAME --region eu-central-1
+cp ~/.kube/config . 
 ```
 
 ### Setup our Cloud Storage 
@@ -53,22 +53,22 @@ cp ~/.kube/config .
 # deploy EFS storage driver
 kubectl apply -k "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
 
-# get VPC ID
-aws eks describe-cluster --name getting-started-eks --query "cluster.resourcesVpcConfig.vpcId" --output text
-# Get CIDR range
-aws ec2 describe-vpcs --vpc-ids vpc-id --query "Vpcs[].CidrBlock" --output text
+# get VPC ID (and save it to txt file)
+aws eks describe-cluster --name CLUSTER_NAME --query "cluster.resourcesVpcConfig.vpcId" --output text
+# Get CIDR range (and save it to txt file)
+aws ec2 describe-vpcs --vpc-ids VPC_ID --query "Vpcs[].CidrBlock" --output text
 
-# security for our instances to access file storage
-aws ec2 create-security-group --description efs-test-sg --group-name efs-sg --vpc-id VPC_ID
-aws ec2 authorize-security-group-ingress --group-id sg-xxx  --protocol tcp --port 2049 --cidr VPC_CIDR
+# security for our instances to access file storage 
+aws ec2 create-security-group --description efs-test-sg --group-name efs-sg --vpc-id VPC_ID  # and save it to txt file
+aws ec2 authorize-security-group-ingress --group-id sg-xxxxxxx --protocol tcp --port 2049 --cidr VPC_CIDR 
 
-# create storage
+# create storage (and save FileSystemId to txt file)
 aws efs create-file-system --creation-token eks-efs
 
-# create mount point 
-aws efs create-mount-target --file-system-id FileSystemId --subnet-id SubnetID --security-group GroupID
+# create mount point (look subnet_id in created instance in EC2)
+aws efs create-mount-target --file-system-id FILE_SYSTEM_ID --subnet-id SUBNET_ID --security-group GROUP_ID
 
-# grab our volume handle to update our PV YAML
+# grab our volume handle to update our PV YAML (don't need we already take FileSystemId)
 aws efs describe-file-systems --query "FileSystems[*].FileSystemId" --output text
 ```
 
@@ -101,7 +101,7 @@ kubectl apply -n jenkins -f ./jenkins/jenkins.deployment.yaml
 kubectl -n jenkins get pods
 ```
 
-### Expose a service for agents
+### Create a service for agents
 
 ```
 kubectl apply -n jenkins -f ./jenkins/jenkins.service.yaml 
@@ -110,39 +110,42 @@ kubectl apply -n jenkins -f ./jenkins/jenkins.service.yaml
 ### Jenkins Initial Setup
 
 ```
-kubectl -n jenkins exec -it <podname> cat /var/jenkins_home/secrets/initialAdminPassword
-kubectl port-forward -n jenkins <podname> 8080
+kubectl -n jenkins exec -it PODNAME cat /var/jenkins_home/secrets/initialAdminPassword
 
-# setup user and recommended basic plugins
-# let it continue while we move on!
+#Port forwarding not workng I use type LoadBalancer in service and go to ELB-DNS to configure jenkins
+kubectl -n jenkins get svc
+
+###You can try create service with type ClusterIP and make port forwarding###
+###kubectl port-forward -n jenkins PODNAME 8080###
+
+#Setup user and recommended basic plugins
+#Update jenkins after setup
 ```
-
-### SSH to our node to get Docker user info
+#### optional step
+### SSH to our node to get Docker user info (Can skip this step - default docker UserID 1001 and GroupID 1950)
 
 ```
 eval $(ssh-agent)
 ssh-add ~/.ssh/id_rsa
-ssh -i ~/.ssh/id_rsa ec2-user@ec2-YourIP.eu-central-1.compute.amazonaws.com
+ssh -i ~/.ssh/id_rsa ec2-user@ec2-YOUR_IP.YOUR_REGION.compute.amazonaws.com
 id -u docker
 cat /etc/group
 # Get user ID for docker
 # Get group ID for docker
 ```
-### Docker Jenkins Agent
-
-Docker file is [here](../dockerfiles/dockerfile) <br/>
+#### optional step
+### Docker Jenkins Agent (Can create it or pull from DockerHub)
 
 ```
 # you can build it
-
 cd ./jenkins/dockerfiles/
-docker build . -t aimvector/jenkins-slave
+docker build -t YOURNAME/jenkins-slave .
 ```
 
 ### Continue Jenkins setup. Configure Kubernetes Plugin
 
-After installing `kubernetes-plugin` for Jenkins
-* Go to Manage Jenkins | Bottom of Page | Cloud | Kubernetes (Add kubenretes cloud)
+#### installing `kubernetes-plugin` for Jenkins and restart
+* Go to Manage Jenkins | Manage Nodes and Clouds | Configure Cloud | Kubernetes (Add kubernetes cloud) | Details
 * Fill out plugin values
     * Name: kubernetes
     * Kubernetes URL: https://kubernetes.default:443
@@ -151,24 +154,38 @@ After installing `kubernetes-plugin` for Jenkins
     * Test Connection | Should be successful! If not, check RBAC permissions and fix it!
     * Jenkins URL: http://jenkins
     * Tunnel : jenkins:50000
-    * Apply cap only on alive pods : yes!
     * Add Kubernetes Pod Template
-        * Name: jenkins-slave
+        * Name: jenkins-slave | templates details
         * Namespace: jenkins
-        * Service Account: jenkins
         * Labels: jenkins-slave (you will need to use this label on all jobs)
-        * Containers | Add Template
+        * Add Containers | Add Container Template
             * Name: jnlp
             * Docker Image: aimvector/jenkins-slave
             * Command to run : <Make this blank>
             * Arguments to pass to the command: <Make this blank>
             * Allocate pseudo-TTY: yes
+            * Advanced | User ID : 1001 | GroupID : 1950
             * Add Volume
                 * HostPath type
                 * HostPath: /var/run/docker.sock
                 * Mount Path: /var/run/docker.sock
-        * Timeout in seconds for Jenkins connection: 300
+                * in Bottom of Page | 
+                * Service Account : jenkins 
+                * User ID : 1001 
+                * GroupID : 1950
 * Save
+
+### Make credentials for DockerHub
+* Go to Manage Jenkins | Credentials | click near "domain global" | add credentials
+* Select kind : secret text 
+    * Secret : YOUR_DOCKER_HUB_USERNAME
+    * ID : DOCKER_USERNAME 
+* save
+* Make second credentials
+* Select kind : secret text 
+    * Secret : YOUR_DOCKER_HUB_PASSWORD
+    * ID : DOCKER_PASSWORD
+* save
 
 ### CI/CD Pipeline.
 
