@@ -266,6 +266,13 @@ kubectl -n jenkins get pods
 kubectl -n jenkins get svc
 ```
 ### Copy DNS from "example-service" and paste to browser. Check working web app.
+
+### Add domain name to our EKS cluster
+* Register free domain like web-a.pp.ua
+* Create hosted zone in Route 53 with same address name
+* Change NS in domain registrator to Route53 Hosted Zone NS
+* Create record - address alias to Cluster LoadBalancer
+* After 15-20 min registerred address start working. (Can check status in https://www.whatsmydns.net/)
 -----------------------------------------
 #### References
 Video
