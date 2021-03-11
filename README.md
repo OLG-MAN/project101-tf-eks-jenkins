@@ -1,4 +1,5 @@
-# project101-tf-eks-jenkins (Final task EPAM DevOps course winter 2020-2021)
+# project101-tf-eks-jenkins 
+## Final task EPAM DevOps course winter 2020-2021
 
 ### Summary
 * CI/CD project using provisioning EKS cluster through Terraform. 
