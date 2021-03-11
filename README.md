@@ -188,6 +188,8 @@ docker build -t YOURNAME/jenkins-slave .
 * save
 
 ### CI/CD Pipeline.
+* Create new item in Jenkins (type pipeline) and copy this code. Save.
+* Build Now
 
 ```
 pipeline {
@@ -265,3 +267,15 @@ kubectl -n jenkins get svc
 ```
 ### Copy DNS from "example-service" and paste to browser. Check working web app.
 -----------------------------------------
+References:
+Video
+https://www.youtube.com/watch?v=eqOCdNO2Nmk
+https://www.youtube.com/watch?v=Qy2A_yJH5-o
+https://www.youtube.com/watch?v=QThadS3Soig
+
+Articles
+https://docs.aws.amazon.com/eks/latest/userguide/metrics-server.html
+https://learn.hashicorp.com/tutorials/terraform/eks?in=terraform/kubernetes
+https://aws.amazon.com/blogs/containers/ci-cd-with-amazon-eks-using-aws-app-mesh-and-gitlab-ci/
+https://aws.amazon.com/blogs/storage/deploying-jenkins-on-amazon-eks-with-amazon-efs/
+https://aws.amazon.com/blogs/opensource/continuous-integration-using-jenkins-and-hashicorp-terraform-on-amazon-eks/
