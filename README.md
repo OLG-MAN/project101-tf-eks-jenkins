@@ -1,12 +1,15 @@
 # project101-tf-eks-jenkins
 
-Summary
+### Summary
 * CI/CD project using provisioning EKS cluster through Terraform. 
 * Deploy Jenkins to EKS through EFS. 
 * Jenkins creating pod agents when CI/CD pipeline start and destroy it when pipeline finish.
-* In pipeline we build container from app in repo push it to docker hub and after delpoy to EKS cluster.
+* In pipeline we copy Github repo, build container from flask-app, push it to DockerHub and after delpoy to EKS cluster.
 
-### Prepairing proccess. Run and configure aws-cli container, install need tools for wsl and k8s cluster.
+### Prepairing proccess. 
+* Copy this repo to local host.
+* Run and configure aws-cli container. 
+* Install need tools for wsl and k8s cluster.
 
 ### Run Amazon CLI and conigure it.
 
