@@ -267,7 +267,7 @@ kubectl -n jenkins get svc
 ```
 ### Copy DNS from "example-service" and paste to browser. Check working web app.
 -----------------------------------------
-References:
+#### References
 Video
 1. https://www.youtube.com/watch?v=eqOCdNO2Nmk
 2. https://www.youtube.com/watch?v=Qy2A_yJH5-o
