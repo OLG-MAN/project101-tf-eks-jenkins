@@ -274,8 +274,7 @@ Video
 3. https://www.youtube.com/watch?v=QThadS3Soig
 
 Articles
-1. https://docs.aws.amazon.com/eks/latest/userguide/metrics-server.html
-2. https://learn.hashicorp.com/tutorials/terraform/eks?in=terraform/kubernetes
-3. https://aws.amazon.com/blogs/containers/ci-cd-with-amazon-eks-using-aws-app-mesh-and-gitlab-ci/
-4. https://aws.amazon.com/blogs/storage/deploying-jenkins-on-amazon-eks-with-amazon-efs/
-5. https://aws.amazon.com/blogs/opensource/continuous-integration-using-jenkins-and-hashicorp-terraform-on-amazon-eks/
+
+1. https://learn.hashicorp.com/tutorials/terraform/eks?in=terraform/kubernetes
+2. https://aws.amazon.com/blogs/storage/deploying-jenkins-on-amazon-eks-with-amazon-efs/
+3. https://aws.amazon.com/blogs/opensource/continuous-integration-using-jenkins-and-hashicorp-terraform-on-amazon-eks/
