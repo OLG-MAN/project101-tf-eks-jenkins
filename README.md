@@ -121,7 +121,7 @@ kubectl -n jenkins get svc
 #Setup user and recommended basic plugins
 #Update jenkins after setup
 ```
-#### optional step
+#### --optional step--
 ### SSH to our node to get Docker user info (Can skip this step - default docker UserID 1001 and GroupID 1950)
 
 ```
@@ -133,7 +133,7 @@ cat /etc/group
 # Get user ID for docker
 # Get group ID for docker
 ```
-#### optional step
+#### --optional step--
 ### Docker Jenkins Agent (Can create it or pull from DockerHub)
 
 ```
@@ -252,4 +252,16 @@ pipeline {
 }
 }
 ```
+
+### Check all components of k8s cluster
+
+```
+#Check our deployment
+kubectl -n jenkins get deploy -owide
+#Check our pods
+kubectl -n jenkins get pods
+#Check services
+kubectl -n jenkins get svc
+```
+### Copy DNS from "example-service" and paste to browser. Check working web app.
 -----------------------------------------
