@@ -285,7 +285,9 @@ kubectl -n jenkins get svc
 -----------------------------------------
 
 #### References
+
 Video
+
 1. https://www.youtube.com/watch?v=eqOCdNO2Nmk
 2. https://www.youtube.com/watch?v=Qy2A_yJH5-o
 3. https://www.youtube.com/watch?v=QThadS3Soig
@@ -295,5 +297,3 @@ Articles
 1. https://learn.hashicorp.com/tutorials/terraform/eks?in=terraform/kubernetes
 2. https://aws.amazon.com/blogs/storage/deploying-jenkins-on-amazon-eks-with-amazon-efs/
 3. https://aws.amazon.com/blogs/opensource/continuous-integration-using-jenkins-and-hashicorp-terraform-on-amazon-eks/
-
-
