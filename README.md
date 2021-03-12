@@ -59,6 +59,7 @@ kubectl apply -k "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernete
 
 # Get VPC ID (and save it to txt file)
 aws eks describe-cluster --name CLUSTER_NAME --query "cluster.resourcesVpcConfig.vpcId" --output text
+
 # Get CIDR range (and save it to txt file)
 aws ec2 describe-vpcs --vpc-ids VPC_ID --query "Vpcs[].CidrBlock" --output text
 
@@ -69,17 +70,11 @@ aws ec2 authorize-security-group-ingress --group-id sg-xxxxxxx --protocol tcp --
 # Create storage (and save FileSystemId to txt file)
 aws efs create-file-system --creation-token eks-efs
 
-# Grab our volume handle to update our PV YAML (don't need we already take FileSystemId)
+# Grab our volume handle to update our jenkins.pv.yaml
 aws efs describe-file-systems --query "FileSystems[*].FileSystemId" --output text
 
 # Create mount point (look subnet_id in created instance in EC2)
 aws efs create-mount-target --file-system-id FS_ID --subnet-id SUBNET_ID --security-group GROUP_ID
-```
-
-### Setup a namespace
-
-```
-kubectl create ns jenkins
 ```
 
 ### Setup our storage for Jenkins
