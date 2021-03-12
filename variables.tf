@@ -4,5 +4,5 @@ variable "region" {
 }
 
 variable "cluster_name" {
-  default = "getting-started-eks-2"
+  default = "final-task-eks"
 }

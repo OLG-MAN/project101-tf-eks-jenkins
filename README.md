@@ -7,30 +7,30 @@
 * Jenkins creating pod agents when CI/CD pipeline start and destroy it when pipeline finish.
 * In pipeline we copy Github repo, build container from flask-app, push it to DockerHub and after delpoy to EKS cluster.
 
-### Prepairing proccess. 
+### Prepairing proccess
 * Copy this repo to local host.
 * Run and configure aws-cli container. 
-* Install need tools for wsl and k8s cluster.
+* Install need tools for WSL and k8s cluster.
 
-### Run Amazon CLI and conigure it.
+### Run work Container with Amazon CLI and conigure it
 
 ```
 docker run -it --rm -v ${PWD}:/work -w /work --entrypoint /bin/sh amazon/aws-cli:latest
 yum install -y jq gzip nano tar git curl wget
 ```
 
-### Install kubectl, eksctl, terraform.
+### Install kubectl, eksctl, terraform
 
 ```
-# kubectl
+# Install kubectl
 curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl
 
-# eksctl (if need)
+# Install eksctl
 curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 mv /tmp/eksctl /usr/local/bin
 
-# terraform install
+# Install Terrform
 yum install -y yum-utils
 yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
 yum -y install terraform
@@ -46,7 +46,7 @@ aws configure
 terraform init
 terraform apply
 
-# update kube config after EKS created.
+# Update kube config after EKS created.
 aws eks update-kubeconfig --name CLUSTER_NAME --region eu-central-1
 cp ~/.kube/config . 
 ```
@@ -54,26 +54,26 @@ cp ~/.kube/config .
 ### Setup our Cloud Storage 
 
 ```
-# deploy EFS storage driver
+# Deploy EFS storage driver
 kubectl apply -k "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
 
-# get VPC ID (and save it to txt file)
+# Get VPC ID (and save it to txt file)
 aws eks describe-cluster --name CLUSTER_NAME --query "cluster.resourcesVpcConfig.vpcId" --output text
 # Get CIDR range (and save it to txt file)
 aws ec2 describe-vpcs --vpc-ids VPC_ID --query "Vpcs[].CidrBlock" --output text
 
-# security for our instances to access file storage 
+# Security for our instances to access file storage 
 aws ec2 create-security-group --description efs-test-sg --group-name efs-sg --vpc-id VPC_ID  # and save it to txt file
 aws ec2 authorize-security-group-ingress --group-id sg-xxxxxxx --protocol tcp --port 2049 --cidr VPC_CIDR 
 
-# create storage (and save FileSystemId to txt file)
+# Create storage (and save FileSystemId to txt file)
 aws efs create-file-system --creation-token eks-efs
 
-# create mount point (look subnet_id in created instance in EC2)
-aws efs create-mount-target --file-system-id FILE_SYSTEM_ID --subnet-id SUBNET_ID --security-group GROUP_ID
-
-# grab our volume handle to update our PV YAML (don't need we already take FileSystemId)
+# Grab our volume handle to update our PV YAML (don't need we already take FileSystemId)
 aws efs describe-file-systems --query "FileSystems[*].FileSystemId" --output text
+
+# Create mount point (look subnet_id in created instance in EC2)
+aws efs create-mount-target --file-system-id FS_ID --subnet-id SUBNET_ID --security-group GROUP_ID
 ```
 
 ### Setup a namespace
@@ -85,13 +85,15 @@ kubectl create ns jenkins
 ### Setup our storage for Jenkins
 
 ```
+# Create namespace check storage class
+kubectl create ns jenkins
 kubectl get storageclass
 
-# create volume (copy fs-xxxxxx to file)
+# Create volume (copy fs-xxxxxx to file jenkins.pv.yaml) and check it
 kubectl apply -f ./jenkins/amazon-eks/jenkins.pv.yaml 
 kubectl get pv
 
-# create volume claim
+# Create volume claim and check it
 kubectl apply -n jenkins -f ./jenkins/amazon-eks/jenkins.pvc.yaml
 kubectl -n jenkins get pvc
 ```
@@ -99,7 +101,7 @@ kubectl -n jenkins get pvc
 ### Deploy Jenkins
 
 ```
-# rbac
+# Install RBAC and Deploy Jenkins check it
 kubectl apply -n jenkins -f ./jenkins/jenkins.rbac.yaml 
 kubectl apply -n jenkins -f ./jenkins/jenkins.deployment.yaml
 kubectl -n jenkins get pods
@@ -116,16 +118,17 @@ kubectl apply -n jenkins -f ./jenkins/jenkins.service.yaml
 ```
 kubectl -n jenkins exec -it PODNAME cat /var/jenkins_home/secrets/initialAdminPassword
 
-#Port forwarding not workng I use type LoadBalancer in service and go to ELB-DNS to configure jenkins
+# Use type LoadBalancer in service and go to ELB-DNS to configure Jenkins
 kubectl -n jenkins get svc
 
-###You can try create service with type ClusterIP and make port forwarding###
-###kubectl port-forward -n jenkins PODNAME 8080###
+### Second option is create service with type ClusterIP and make port forwarding
+### kubectl port-forward -n jenkins POD_NAME 8080
 
-#Setup user and recommended basic plugins
-#Update jenkins after setup
+# Setup user and recommended basic plugins
+# Update jenkins after setup
 ```
-#### --optional step--
+
+#### ---optional step---
 ### SSH to our node to get Docker user info (Can skip this step - default docker UserID 1001 and GroupID 1950)
 
 ```
@@ -137,7 +140,8 @@ cat /etc/group
 # Get user ID for docker
 # Get group ID for docker
 ```
-#### --optional step--
+
+#### ---optional step---
 ### Docker Jenkins Agent (Can create it or pull from DockerHub)
 
 ```
@@ -148,7 +152,7 @@ docker build -t YOURNAME/jenkins-slave .
 
 ### Continue Jenkins setup. Configure Kubernetes Plugin
 
-#### installing `kubernetes-plugin` for Jenkins and restart
+* Installing `kubernetes-plugin` for Jenkins and restart
 * Go to Manage Jenkins | Manage Nodes and Clouds | Configure Cloud | Kubernetes (Add kubernetes cloud) | Details
 * Fill out plugin values
     * Name: kubernetes
@@ -269,6 +273,7 @@ kubectl -n jenkins get pods
 #Check services
 kubectl -n jenkins get svc
 ```
+
 ### Copy DNS from "example-service" and paste to browser. Check working web app.
 
 ### Add domain name to our EKS cluster
@@ -278,6 +283,7 @@ kubectl -n jenkins get svc
 * Create record - address alias to Cluster LoadBalancer
 * After 15-20 min registerred address start working. (Can check status in https://www.whatsmydns.net/)
 -----------------------------------------
+
 #### References
 Video
 1. https://www.youtube.com/watch?v=eqOCdNO2Nmk
@@ -289,3 +295,5 @@ Articles
 1. https://learn.hashicorp.com/tutorials/terraform/eks?in=terraform/kubernetes
 2. https://aws.amazon.com/blogs/storage/deploying-jenkins-on-amazon-eks-with-amazon-efs/
 3. https://aws.amazon.com/blogs/opensource/continuous-integration-using-jenkins-and-hashicorp-terraform-on-amazon-eks/
+
+
