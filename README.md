@@ -113,7 +113,7 @@ kubectl apply -n jenkins -f ./jenkins/jenkins.service.yaml
 ```
 kubectl -n jenkins exec -it POD_NAME cat /var/jenkins_home/secrets/initialAdminPassword
 
-# Use type LoadBalancer in service and go to ELB-DNS to configure Jenkins
+# Use type LoadBalancer in service and go to LoadBalancer DNS to configure Jenkins
 kubectl -n jenkins get svc
 
 ### Second option is create service with type ClusterIP and make port forwarding
@@ -191,8 +191,10 @@ docker build -t YOURNAME/jenkins-slave .
 * save
 
 ### CI/CD Pipeline.
-* Create new item in Jenkins (type pipeline) and copy this code. Save.
-* Build Now
+* Create new item in Jenkins (type pipeline) and copy code below to pipeline.
+* Make Github webhook trigger.
+* Save.
+* Click "Build now" or push to Github repo to pipeline start.
 
 ```
 pipeline {
