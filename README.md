@@ -57,20 +57,20 @@ cp ~/.kube/config .
 # Deploy EFS storage driver
 kubectl apply -k "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
 
-# Get VPC ID (and save it to txt file)
+# Get VPC_ID (and save it to txt file)
 aws eks describe-cluster --name CLUSTER_NAME --query "cluster.resourcesVpcConfig.vpcId" --output text
 
 # Get CIDR range (and save it to txt file)
 aws ec2 describe-vpcs --vpc-ids VPC_ID --query "Vpcs[].CidrBlock" --output text
 
-# Security for our instances to access file storage 
-aws ec2 create-security-group --description efs-test-sg --group-name efs-sg --vpc-id VPC_ID  # and save it to txt file
-aws ec2 authorize-security-group-ingress --group-id sg-xxxxxxx --protocol tcp --port 2049 --cidr VPC_CIDR 
+# Security for our instances to access file storage (and save sg-xxxxxxx to txt file)
+aws ec2 create-security-group --description efs-test-sg --group-name efs-sg --vpc-id VPC_ID
+aws ec2 authorize-security-group-ingress --group-id sg-xxxxxxx --protocol tcp --port 2049 --cidr VPC_CIDR
 
-# Create storage (and save FileSystemId to txt file)
+# Create storage
 aws efs create-file-system --creation-token eks-efs
 
-# Grab our volume handle to update our jenkins.pv.yaml
+# Grab our volume handle. Save FileSystemId to txt file and update our jenkins.pv.yaml
 aws efs describe-file-systems --query "FileSystems[*].FileSystemId" --output text
 
 # Create mount point (look subnet_id in created instance in EC2)
@@ -111,7 +111,7 @@ kubectl apply -n jenkins -f ./jenkins/jenkins.service.yaml
 ### Jenkins Initial Setup
 
 ```
-kubectl -n jenkins exec -it PODNAME cat /var/jenkins_home/secrets/initialAdminPassword
+kubectl -n jenkins exec -it POD_NAME cat /var/jenkins_home/secrets/initialAdminPassword
 
 # Use type LoadBalancer in service and go to ELB-DNS to configure Jenkins
 kubectl -n jenkins get svc

@@ -5,3 +5,5 @@
 config
 kubeconfig_getting-started-eks-2
 data.txt
+kubeconfig_final-task-eks
+data
