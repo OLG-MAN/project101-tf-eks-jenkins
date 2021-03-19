@@ -257,7 +257,7 @@ pipeline {
         }
     }
 }
-}
+} 
 ```
 
 ### Check all components of k8s cluster
