@@ -12,7 +12,7 @@
 * Run and configure aws-cli container. 
 * Install need tools for WSL and k8s cluster.
 
-### Run work Container with Amazon CLI and conigure it
+### Run work Container with Amazon CLI and configure it
 
 ```
 docker run -it --rm -v ${PWD}:/work -w /work --entrypoint /bin/sh amazon/aws-cli:latest
@@ -30,7 +30,7 @@ chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl
 curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 mv /tmp/eksctl /usr/local/bin
 
-# Install Terrform
+# Install Terraform
 yum install -y yum-utils
 yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
 yum -y install terraform
@@ -39,7 +39,7 @@ yum -y install terraform
 ### Configure AWS credentials and provisioning EKS cluster
 
 ```
-# Configure your credentials from before created IAM account with all needed permissions
+# Configure credentials from before created IAM account with all needed permissions
 aws configure
 
 # Init and Deploy Terraform infrastructure
@@ -195,7 +195,7 @@ docker build -t YOURNAME/jenkins-slave .
 * Create new item in Jenkins (type pipeline) and copy code below to pipeline.
 * Make Github webhook trigger.
 * Save.
-* Click "Build now" or push to Github repo to pipeline start.
+* Click "Build now" or make a push to the Github repo to pipeline started.
 
 ```
 pipeline {
@@ -261,14 +261,14 @@ pipeline {
 }
 ```
 
-### Check all components of k8s cluster
+### Check all components of EKS cluster
 
 ```
-#Check our deployment
+# Check our deployment
 kubectl -n jenkins get deploy -owide
-#Check our pods
+# Check our pods
 kubectl -n jenkins get pods
-#Check services
+# Check services
 kubectl -n jenkins get svc
 ```
 
