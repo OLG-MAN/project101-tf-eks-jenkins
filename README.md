@@ -302,4 +302,4 @@ https://github.com/dibashthapa/Flask-Ecommerce
 
 Project presentation
 
-[Download](https://github.com/OLG-MAN/project101-tf-eks-jenkins/CI_CD task.pdf)
+https://github.com/OLG-MAN/project101-tf-eks-jenkins/CI_CD task.pdf
