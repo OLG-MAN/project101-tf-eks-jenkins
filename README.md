@@ -295,3 +295,11 @@ Articles
 1. https://learn.hashicorp.com/tutorials/terraform/eks?in=terraform/kubernetes
 2. https://aws.amazon.com/blogs/storage/deploying-jenkins-on-amazon-eks-with-amazon-efs/
 3. https://aws.amazon.com/blogs/opensource/continuous-integration-using-jenkins-and-hashicorp-terraform-on-amazon-eks/
+
+Python Web App
+
+https://github.com/dibashthapa/Flask-Ecommerce
+
+Project presentation
+
+[Download](https://github.com/OLG-MAN/project101-tf-eks-jenkins/CI_CD task.pdf)
