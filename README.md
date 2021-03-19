@@ -39,7 +39,7 @@ yum -y install terraform
 ### Configure AWS credentials and provisioning EKS cluster
 
 ```
-# Configure your credenrtials from before created IAM account with all needed permissions
+# Configure your credentials from before created IAM account with all needed permissions
 aws configure
 
 # Init and Deploy Terraform infrastructure
@@ -55,7 +55,7 @@ cp ~/.kube/config .
 
 ```
 # Deploy EFS storage driver
-kubectl apply -k "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
+kubectl apply -k "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.1"
 
 # Get VPC_ID (and save it to txt file)
 aws eks describe-cluster --name CLUSTER_NAME --query "cluster.resourcesVpcConfig.vpcId" --output text
@@ -70,10 +70,10 @@ aws ec2 authorize-security-group-ingress --group-id sg-xxxxxxx --protocol tcp --
 # Create storage
 aws efs create-file-system --creation-token eks-efs
 
-# Grab our volume handle. Save FileSystemId to txt file and update our jenkins.pv.yaml
+# Grab and Save FileSystemId to txt file and update our jenkins.pv.yaml
 aws efs describe-file-systems --query "FileSystems[*].FileSystemId" --output text
 
-# Create mount point (look subnet_id in created instance in EC2)
+# Create mount point (looking SUBNET_ID in created instance in EC2)
 aws efs create-mount-target --file-system-id FS_ID --subnet-id SUBNET_ID --security-group GROUP_ID
 ```
 
@@ -102,7 +102,7 @@ kubectl apply -n jenkins -f ./jenkins/jenkins.deployment.yaml
 kubectl -n jenkins get pods
 ```
 
-### Create a service for agents
+### Create a service for Jenkins
 
 ```
 kubectl apply -n jenkins -f ./jenkins/jenkins.service.yaml 
@@ -111,6 +111,7 @@ kubectl apply -n jenkins -f ./jenkins/jenkins.service.yaml
 ### Jenkins Initial Setup
 
 ```
+# Grab password for Jenkins
 kubectl -n jenkins exec -it POD_NAME cat /var/jenkins_home/secrets/initialAdminPassword
 
 # Use type LoadBalancer in service and go to LoadBalancer DNS to configure Jenkins
